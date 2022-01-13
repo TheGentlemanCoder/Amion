@@ -1,3 +1,5 @@
+[Click here to try it out!](https://avistad.com)
+
 ### AVISTAD
 
 A portmanteau of the Spanish words for "airplane" and "friendship".
