@@ -1,0 +1,26 @@
+{
+  "name": "avistad-server",
+  "version": "1.0.0",
+  "description": "Node.js and MySQL backend for handling API calls",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "root@avistad.com:/srv/Avistad.git"
+  },
+  "keywords": [
+    "avistad",
+    "airplanes",
+    "flights",
+    "server",
+    "meetings",
+    "friends"
+  ],
+  "author": "Nicholas R. Smith",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.2"
+  }
+}
