@@ -21,11 +21,14 @@
   "author": "Nicholas R. Smith",
   "license": "ISC",
   "dependencies": {
+    "amadeus": "^5.7.1",
     "body-parser": "^1.19.1",
     "express": "^4.17.2",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "request": "^2.88.2"
   },
   "devDependencies": {
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.15",
+    "url": "^0.11.0"
   }
 }
