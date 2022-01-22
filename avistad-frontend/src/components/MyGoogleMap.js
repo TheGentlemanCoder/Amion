@@ -51,8 +51,7 @@ class MyGoogleMap extends Component {
     _onClick = (value) => {
         this.setState({
             lat: value.lat,
-            lng: value.lng,
-            center: [value.lat, value.lng]
+            lng: value.lng
         });
     }
 
