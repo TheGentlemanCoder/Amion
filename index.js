@@ -8,9 +8,12 @@ const { getExchangeRateEUROverUSD } = require('./exchange');
 const PORT = process.env.PORT || 3000;
 const app = express();
 
+const AMADEUS_CLIENT_ID = process.env.AMADEUS_CLIENT_ID;
+const AMADEUS_CLIENT_SECRET = process.env.AMADEUS_CLIENT_SECRET;
+
 const amadeus = new Amadeus({
-    clientId: 'curWjETsq1twPY5Y0m4NNXWgnDtvCRfC',
-    clientSecret: 'Ce0wYhthwQUiR120'
+    clientId: AMADEUS_CLIENT_ID,
+    clientSecret: AMADEUS_CLIENT_SECRET
 });
 
 app.use(bodyParser.json());
