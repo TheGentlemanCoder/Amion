@@ -51,7 +51,8 @@ class MyGoogleMap extends Component {
     _onClick = (value) => {
         this.setState({
             lat: value.lat,
-            lng: value.lng
+            lng: value.lng,
+            center: [value.lat, value.lng]
         });
     }
 
@@ -83,8 +84,6 @@ class MyGoogleMap extends Component {
         const geocoder = new mapApi.Geocoder;
 
         geocoder.geocode({ 'location': { lat: this.state.lat, lng: this.state.lng } }, (results, status) => {
-            console.log(results);
-            console.log(status);
             if (status === 'OK') {
                 if (results[0]) {
                     this.zoom = 12;
@@ -117,9 +116,9 @@ class MyGoogleMap extends Component {
 
         return (
             <Wrapper>
-                { mapApiLoaded && (
+                {mapApiLoaded && (
                     <div>
-                        <AutoComplete map={mapInstance} mapApi={mapApi} addplace={this.addPlace}/>
+                        <AutoComplete map={mapInstance} mapApi={mapApi} addplace={this.addPlace} />
                     </div>
                 )}
                 <GoogleMapReact

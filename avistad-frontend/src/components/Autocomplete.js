@@ -40,7 +40,7 @@ class AutoComplete extends Component {
     onPlaceChanged = ({ map, addplace } = this.props) => {
         const place = this.autoComplete.getPlace();
 
-        if (!place.geomerty) {
+        if (!place.geometry) {
             return;
         }
 
