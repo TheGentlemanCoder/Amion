@@ -5,7 +5,7 @@ const Amadeus = require('amadeus');
 const url = require('url');
 const { getExchangeRateEUROverUSD } = require('./exchange');
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 const app = express();
 
 const amadeus = new Amadeus({
