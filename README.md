@@ -27,3 +27,8 @@ Avistad calculates which location offers the cheapester *average* ticket. Natura
 that means that some will pay more than the average for their ticket and some will
 pay less. If the cost of travel is truly an issue, I hope that your friends would
 help you. No software can bring about kindness.
+
+### How do I coordinate with my friends?
+
+The link you create will be used to track what starting locations and possible destinations
+you and your friends have chosen. Share this link to coordinate with your friends.
