@@ -15,7 +15,6 @@ async function api_call(url) {
 }
 
 async function getExchangeRateEUROverUSD() {
-    console.log(OPEN_EXCHANGE_API_KEY);
     exchangeURL = 'https://openexchangerates.org/api/latest.json?app_id=' + OPEN_EXCHANGE_API_KEY + '&base=USD';
     json_response = await api_call(exchangeURL);
     return json_response['rates']['EUR'];
