@@ -3,6 +3,8 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const Amadeus = require('amadeus');
 const url = require('url');
+const cors = require('cors'); 
+
 const { getExchangeRateEUROverUSD } = require('./exchange');
 
 const PORT = process.env.PORT || 3000;
@@ -17,7 +19,12 @@ const amadeus = new Amadeus({
 });
 
 app.use(bodyParser.json());
+app.use(cors());
 app.use(express.static(path.join(__dirname, './avistad-frontend/build')));
+
+app.post('/synchronize', async (req, res) => {
+    console.log('Connected to /synchronize endpoint: ', req.body);
+});
 
 app.get('/convert', async (req, res) => {
     const queryObject = url.parse(req.url, true).query;

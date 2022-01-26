@@ -109,8 +109,19 @@ class MyGoogleMap extends Component {
         }, this.synchronizeStartingLocationsWithDatabase);
     }
 
-    synchronizeStartingLocationsWithDatabase = () => {
+    synchronizeStartingLocationsWithDatabase = async () => {
         console.log("[*] Starting locations: ", this.state.startingLocations);
+        await fetch('/synchronize', {
+            method: 'POST',
+            cache: 'no-cache',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ startingLocations: this.state.destinationLocations })
+        })
+        .then((response) => {
+            console.log('Finished API call: ', response);
+        }).catch((error) => {
+            console.log('[-] Error: ', error);
+        });
     }
 
     addDestinationLocation = (address) => {
@@ -122,8 +133,19 @@ class MyGoogleMap extends Component {
         }, this.synchronizeDestinationLocationsWithDatabase);
     }
 
-    synchronizeDestinationLocationsWithDatabase = () => {
+    synchronizeDestinationLocationsWithDatabase = async () => {
         console.log("[*] Destination locations: ", this.state.destinationLocations);
+        await fetch('/synchronize', {
+            method: 'POST',
+            cache: 'no-cache',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ destinationLocations: this.state.destinationLocations })
+        })
+        .then((response) => {
+            console.log('Finished API call: ', response);
+        }).catch((error) => {
+            console.log('[-] Error: ', error);
+        });
     }
 
     setCurrentLocation() {
