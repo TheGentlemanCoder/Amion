@@ -3,6 +3,7 @@ import GoogleMapReact from 'google-map-react';
 import styled from 'styled-components';
 import AutoComplete from './Autocomplete';
 import Marker from './Marker';
+import Button from './Button';
 
 const Wrapper = styled.main`
     width: 100%;
@@ -21,7 +22,10 @@ class MyGoogleMap extends Component {
         address: '',
         draggable: true,
         lat: null,
-        lng: null
+        lng: null,
+        url: '',
+        startingLocations: [],
+        destinationLocations: []
     };
 
     componentWillMount() {
@@ -95,6 +99,32 @@ class MyGoogleMap extends Component {
             }
         });
     }
+    
+    addStartingLocation = (address) => {
+        this.setState({ 
+            startingLocations: [
+                ...this.state.startingLocations,
+                address
+            ] 
+        }, this.synchronizeStartingLocationsWithDatabase);
+    }
+
+    synchronizeStartingLocationsWithDatabase = () => {
+        console.log("[*] Starting locations: ", this.state.startingLocations);
+    }
+
+    addDestinationLocation = (address) => {
+        this.setState({ 
+            destinationLocations: [
+                ...this.state.destinationLocations,
+                address
+            ] 
+        }, this.synchronizeDestinationLocationsWithDatabase);
+    }
+
+    synchronizeDestinationLocationsWithDatabase = () => {
+        console.log("[*] Destination locations: ", this.state.destinationLocations);
+    }
 
     setCurrentLocation() {
         if ('geolocation' in navigator) {
@@ -147,6 +177,10 @@ class MyGoogleMap extends Component {
                     <div className="map-details">Latitude: <span>{this.state.lat}</span>, Longitude: <span>{this.state.lng}</span></div>
                     <div className="map-details">Zoom: <span>{this.state.zoom}</span></div>
                     <div className="map-details">Address: <span>{this.state.address}</span></div>
+                </div>
+                <div>
+                    <Button text={"Add Starting Location"} onClick={() => this.addStartingLocation(this.state.address)}/>
+                    <Button text={"Add Destination Location"} onClick={() => this.addDestinationLocation(this.state.address)}/>
                 </div>
             </Wrapper>
         );
