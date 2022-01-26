@@ -24,6 +24,7 @@ class MyGoogleMap extends Component {
         draggable: true,
         lat: null,
         lng: null,
+        link: '',
         url: '',
         startingLocations: [],
         destinationLocations: []
@@ -68,6 +69,7 @@ class MyGoogleMap extends Component {
         });
 
         this._generateAddress();
+        this.generateShareableLink();
     };
 
     addPlace = (place) => {
@@ -128,7 +130,8 @@ class MyGoogleMap extends Component {
             method: 'POST',
             cache: 'no-cache',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ startingLocations: this.state.destinationLocations })
+            body: JSON.stringify({ link: this.state.link,
+                                   startingLocations: this.state.startingLocations })
         })
         .then((response) => {
             console.log('Finished API call: ', response);
@@ -152,7 +155,8 @@ class MyGoogleMap extends Component {
             method: 'POST',
             cache: 'no-cache',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ destinationLocations: this.state.destinationLocations })
+            body: JSON.stringify({ link: this.state.link,
+                                   destinationLocations: this.state.destinationLocations })
         })
         .then((response) => {
             console.log('Finished API call: ', response);
@@ -163,14 +167,18 @@ class MyGoogleMap extends Component {
 
     generateShareableLink = () => {
         const base64 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/";
-        var newURL = "";
+        var newLink = "";
         for (var i = 0; i < 8; i += 1) {
-            newURL += base64[Math.floor(Math.random() * base64.length)]
+            newLink += base64[Math.floor(Math.random() * base64.length)]
         }
 
-        newURL = 'https://avistad.com/' + newURL;
+        this.setState({ link: newLink });
+    }
 
-        this.setState({ url: newURL});
+    showShareableLink = () => {
+        const newURL = 'https://avistad.com/' + this.state.link;
+
+        this.setState({ url: newURL });
     }
 
     render() {
@@ -216,7 +224,7 @@ class MyGoogleMap extends Component {
                 <div>
                     <Button text={"Add Starting Location"} onClick={() => this.addStartingLocation(this.state.address)}/>
                     <Button text={"Add Destination Location"} onClick={() => this.addDestinationLocation(this.state.address)}/>
-                    <Button text={"Generate Shareable Link"} onClick={() => this.generateShareableLink()}/>
+                    <Button text={"Show Shareable Link"} onClick={() => this.showShareableLink()}/>
                     <Link text={this.state.url} onClick={() => navigator.clipboard.writeText(this.state.url)}/>
                 </div>
             </Wrapper>
