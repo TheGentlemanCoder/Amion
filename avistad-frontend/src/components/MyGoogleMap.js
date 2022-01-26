@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import AutoComplete from './Autocomplete';
 import Marker from './Marker';
 import Button from './Button';
+import Link from './Link';
 
 const Wrapper = styled.main`
     width: 100%;
@@ -99,6 +100,18 @@ class MyGoogleMap extends Component {
             }
         });
     }
+
+    setCurrentLocation() {
+        if ('geolocation' in navigator) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                this.setState({
+                    center: [position.coords.latitude, position.coords.longitude],
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                });
+            });
+        }
+    }
     
     addStartingLocation = (address) => {
         this.setState({ 
@@ -148,16 +161,16 @@ class MyGoogleMap extends Component {
         });
     }
 
-    setCurrentLocation() {
-        if ('geolocation' in navigator) {
-            navigator.geolocation.getCurrentPosition((position) => {
-                this.setState({
-                    center: [position.coords.latitude, position.coords.longitude],
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                });
-            });
+    generateShareableLink = () => {
+        const base64 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/";
+        var newURL = "";
+        for (var i = 0; i < 8; i += 1) {
+            newURL += base64[Math.floor(Math.random() * base64.length)]
         }
+
+        newURL = 'https://avistad.com/' + newURL;
+
+        this.setState({ url: newURL});
     }
 
     render() {
@@ -203,6 +216,8 @@ class MyGoogleMap extends Component {
                 <div>
                     <Button text={"Add Starting Location"} onClick={() => this.addStartingLocation(this.state.address)}/>
                     <Button text={"Add Destination Location"} onClick={() => this.addDestinationLocation(this.state.address)}/>
+                    <Button text={"Generate Shareable Link"} onClick={() => this.generateShareableLink()}/>
+                    <Link text={this.state.url} onClick={() => navigator.clipboard.writeText(this.state.url)}/>
                 </div>
             </Wrapper>
         );
