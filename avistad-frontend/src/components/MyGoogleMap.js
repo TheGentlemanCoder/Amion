@@ -115,23 +115,31 @@ class MyGoogleMap extends Component {
         }
     }
     
-    addStartingLocation = (address) => {
+    addStartingLocation = (address, lat, lng) => {
         this.setState({ 
             startingLocations: [
                 ...this.state.startingLocations,
-                address
+                {
+                    address: address,
+                    lat: lat,
+                    lng: lng
+                }
             ] 
         }, this.synchronizeStartingLocationsWithDatabase);
     }
 
     synchronizeStartingLocationsWithDatabase = async () => {
         console.log("[*] Starting locations: ", this.state.startingLocations);
+
+        // send the most recently added location
+        const location = this.state.startingLocations[this.state.startingLocations.length - 1]
+
         await fetch('/synchronize', {
             method: 'POST',
             cache: 'no-cache',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ link: this.state.link,
-                                   startingLocations: this.state.startingLocations })
+                                   startingLocation: location })
         })
         .then((response) => {
             console.log('Finished API call: ', response);
@@ -140,23 +148,31 @@ class MyGoogleMap extends Component {
         });
     }
 
-    addDestinationLocation = (address) => {
+    addDestinationLocation = (address, lat, lng) => {
         this.setState({ 
             destinationLocations: [
                 ...this.state.destinationLocations,
-                address
+                {
+                    address: address,
+                    lat: lat,
+                    lng: lng
+                }
             ] 
         }, this.synchronizeDestinationLocationsWithDatabase);
     }
 
     synchronizeDestinationLocationsWithDatabase = async () => {
         console.log("[*] Destination locations: ", this.state.destinationLocations);
+
+        // send the most recently added location
+        const location = this.state.startingLocations[this.state.startingLocations.length - 1]
+
         await fetch('/synchronize', {
             method: 'POST',
             cache: 'no-cache',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ link: this.state.link,
-                                   destinationLocations: this.state.destinationLocations })
+                                   destinationLocation: location })
         })
         .then((response) => {
             console.log('Finished API call: ', response);
@@ -210,11 +226,24 @@ class MyGoogleMap extends Component {
                     yesIWantToUseGoogleMapApiInternals
                     onGoogleApiLoaded={({ map, maps }) => this.apiHasLoaded(map, maps)}
                 >
+                    {this.state.startingLocations.map((startingLocation, id) => {
+                        return <Marker
+                                key={id}
+                                text={startingLocation.address}
+                                lat={startingLocation.lat}
+                                lng={startingLocation.lng}/>
+                    })}
+                    {this.state.destinationLocations.map((destinationLocation, id) => {
+                        return <Marker
+                                key={id}
+                                text={destinationLocation.address}
+                                lat={destinationLocation.lat}
+                                lng={destinationLocation.lng}/>
+                    })}
                     <Marker
-                        text={this.state.address}
-                        lat={this.state.lat}
-                        lng={this.state.lng}
-                    />
+                     text={this.state.address}
+                     lat={this.state.lat}
+                     lng={this.state.lng}/>
                 </GoogleMapReact>
                 <div className="info-wrapper">
                     <div className="map-details">Latitude: <span>{this.state.lat}</span>, Longitude: <span>{this.state.lng}</span></div>
@@ -222,8 +251,8 @@ class MyGoogleMap extends Component {
                     <div className="map-details">Address: <span>{this.state.address}</span></div>
                 </div>
                 <div>
-                    <Button text={"Add Starting Location"} onClick={() => this.addStartingLocation(this.state.address)}/>
-                    <Button text={"Add Destination Location"} onClick={() => this.addDestinationLocation(this.state.address)}/>
+                    <Button text={"Add Starting Location"} onClick={() => this.addStartingLocation(this.state.address, this.state.lat, this.state.lng)}/>
+                    <Button text={"Add Destination Location"} onClick={() => this.addDestinationLocation(this.state.address, this.state.lat, this.state.lng)}/>
                     <Button text={"Show Shareable Link"} onClick={() => this.showShareableLink()}/>
                     <Link text={this.state.url} onClick={() => navigator.clipboard.writeText(this.state.url)}/>
                 </div>
