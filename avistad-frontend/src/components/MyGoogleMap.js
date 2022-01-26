@@ -70,20 +70,29 @@ class MyGoogleMap extends Component {
 
         this._generateAddress();
         this.recoverInstance();
-        this.generateShareableLink();
+
+        if (window.location.pathname === '/') {
+            this.generateShareableLink();
+        }
     };
 
     recoverInstance = async () => {
         if (window.location.pathname !== '/') {
             // not at root path, could be a previous instance
-            await fetch(window.location.pathname, {
+            const response = await fetch(window.location.pathname, {
                 method: 'POST'
             })
             .then((response) => {
-                console.log('Finished API call: ', response);
+                return response;
             }).catch((error) => {
                 console.log('[-] Error: ', error);
             });
+
+            if (response["previousInstance"] === true) {
+                // recover the previous instance 
+                const startingLocations = response["startingLocations"]
+                const destinationLocations = response["destinationLocations"]
+            }
         }
     }
 
@@ -180,7 +189,7 @@ class MyGoogleMap extends Component {
         console.log("[*] Destination locations: ", this.state.destinationLocations);
 
         // send the most recently added location
-        const location = this.state.startingLocations[this.state.startingLocations.length - 1]
+        const location = this.state.destinationLocations[this.state.destinationLocations.length - 1]
 
         await fetch('/synchronize', {
             method: 'POST',

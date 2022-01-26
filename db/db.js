@@ -119,6 +119,13 @@ async function insertAddress(address, latitude, longitude) {
 }
 
 async function insertLink(link) {
+    if (await linkExists(link)) {
+        // link already exiss in the database
+        return;
+    }
+
+    // link does not already exist in the database
+
     const parameterized_query = "INSERT INTO LinkLUT (link) VALUES (?)";
 
     pool.getConnection()
@@ -126,12 +133,7 @@ async function insertLink(link) {
             await conn.query(parameterized_query, [link]);
             await conn.commit();
         }).catch((error) => {
-            if (error.toString().includes("Duplicate entry")) {
-                console.log("[*] Duplicate entry");
-                return;
-            } else {
-                console.log("[-] MariaDB Error: ", error);
-            }
+            console.log("[-] MariaDB Error: ", error);
         });
 }
 

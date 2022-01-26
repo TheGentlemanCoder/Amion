@@ -28,20 +28,6 @@ const amadeus = new Amadeus({
 app.use(bodyParser.json());
 app.use(cors());
 
-/*
-app.use(express.cookieParser());
-
-// URL path cookie for handling state
-app.use((req, res, next) => {
-    if (req.path.slice(1).length > 0) {
-        // create path cookie for user
-        res.cookie('shareableLinkPath', req.path.slice(1));
-    }
-
-    next();
-});
-*/
-
 app.use(express.static(path.join(__dirname, './avistad-frontend/build')));
 
 // sanitize inputs
@@ -111,6 +97,11 @@ app.get('/api', (req, res) => {
     }).catch((error) => {
         console.log("[-] Error: ", error.code);
     });
+});
+
+app.get('*', (req, res) => {
+    // pass users along to the main page
+    res.sendFile(path.join(__dirname, './avistad-frontend/build/index.html'));
 });
 
 app.post('*', async (req, res) => {
