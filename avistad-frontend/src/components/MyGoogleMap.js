@@ -69,8 +69,23 @@ class MyGoogleMap extends Component {
         });
 
         this._generateAddress();
+        this.recoverInstance();
         this.generateShareableLink();
     };
+
+    recoverInstance = async () => {
+        if (window.location.pathname !== '/') {
+            // not at root path, could be a previous instance
+            await fetch(window.location.pathname, {
+                method: 'POST'
+            })
+            .then((response) => {
+                console.log('Finished API call: ', response);
+            }).catch((error) => {
+                console.log('[-] Error: ', error);
+            });
+        }
+    }
 
     addPlace = (place) => {
         this.setState({

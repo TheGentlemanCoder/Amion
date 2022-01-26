@@ -4,7 +4,14 @@ const bodyParser = require('body-parser');
 const Amadeus = require('amadeus');
 const url = require('url');
 const cors = require('cors'); 
+const mariadb = require('mariadb');
+const sanitizer = require('sanitize');
 
+const { fetchStartingLocations,
+        fetchDestinationLocations,
+        linkExists,
+        insertStartingLocation,
+        insertDestinationLocation } = require('./db/db');
 const { getExchangeRateEUROverUSD } = require('./exchange');
 
 const PORT = process.env.PORT || 3000;
@@ -20,10 +27,52 @@ const amadeus = new Amadeus({
 
 app.use(bodyParser.json());
 app.use(cors());
+
+/*
+app.use(express.cookieParser());
+
+// URL path cookie for handling state
+app.use((req, res, next) => {
+    if (req.path.slice(1).length > 0) {
+        // create path cookie for user
+        res.cookie('shareableLinkPath', req.path.slice(1));
+    }
+
+    next();
+});
+*/
+
 app.use(express.static(path.join(__dirname, './avistad-frontend/build')));
+
+// sanitize inputs
+app.use(sanitizer.middleware);
 
 app.post('/synchronize', async (req, res) => {
     console.log('Connected to /synchronize endpoint: ', req.body);
+
+    if (req.body && req.body["link"]) {
+        const link = req.body["link"];
+
+        if (req.body["startingLocation"]) {
+            const location = req.body["startingLocation"]
+            
+            const address = location["address"];
+            const lat = location["lat"];
+            const lng = location["lng"];
+
+            // add new location to the database
+            await insertStartingLocation(link, address, lat, lng);
+        } else if (req.body["destinationLocation"]) {
+            const location = req.body["destinationLocation"];
+
+            const address = location["address"];
+            const lat = location["lat"];
+            const lng = location["lng"];
+
+            // add new location to the database
+            await insertDestinationLocation(link, address, lat, lng);
+        }
+    }
 });
 
 app.get('/convert', async (req, res) => {
@@ -63,6 +112,31 @@ app.get('/api', (req, res) => {
         console.log("[-] Error: ", error.code);
     });
 });
+
+app.post('*', async (req, res) => {
+    const link = req.path.slice(1); // remove leading forward slash
+
+    if (await linkExists(link)) {
+        // link does exist in the database (recovered instance)
+        const startingLocations = await fetchStartingLocations(link);
+        const destinationLocations = await fetchDestinationLocations(link);
+
+        console.log(startingLocations);
+        console.log(destinationLocations);
+
+        res.json({
+            previousInstance: true,
+            startingLocations: startingLocations,
+            destiantionLocations: destinationLocations
+        });
+    } else {
+        // link does not exist in the database (new instance)
+        res.json({
+            previousInstance: false
+        });
+    }
+});
+
 
 app.listen(PORT, () => {
     console.log(`[*] Backend server listening on :${PORT}...`);
