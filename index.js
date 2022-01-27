@@ -43,8 +43,8 @@ app.post('/synchronize', async (req, res) => {
             const location = req.body["startingLocation"]
             
             const address = location["address"];
-            const lat = location["lat"];
-            const lng = location["lng"];
+            const lat = location["latitude"];
+            const lng = location["longitude"];
 
             // add new location to the database
             await insertStartingLocation(link, address, lat, lng);
@@ -52,8 +52,8 @@ app.post('/synchronize', async (req, res) => {
             const location = req.body["destinationLocation"];
 
             const address = location["address"];
-            const lat = location["lat"];
-            const lng = location["lng"];
+            const lat = location["latitude"];
+            const lng = location["longitude"];
 
             // add new location to the database
             await insertDestinationLocation(link, address, lat, lng);
@@ -118,7 +118,7 @@ app.post('*', async (req, res) => {
         res.json({
             previousInstance: true,
             startingLocations: startingLocations,
-            destiantionLocations: destinationLocations
+            destinationLocations: destinationLocations
         });
     } else {
         // link does not exist in the database (new instance)

@@ -70,29 +70,39 @@ class MyGoogleMap extends Component {
 
         this._generateAddress();
         this.recoverInstance();
-
-        if (window.location.pathname === '/') {
-            this.generateShareableLink();
-        }
+        this.getShareableLink();
     };
 
     recoverInstance = async () => {
         if (window.location.pathname !== '/') {
             // not at root path, could be a previous instance
-            const response = await fetch(window.location.pathname, {
-                method: 'POST'
-            })
-            .then((response) => {
-                return response;
+            await fetch(window.location.pathname, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then((response) => {
+                return response.json();
+            }).then((result) => {
+                console.log("[*] Checking if previousInstance === true...");
+                console.log(result);
+                if (result["previousInstance"] === true) {
+                    // recover the previous instance 
+                    console.log("[*] previousInstance === true!!!");
+                    const startingLocations = result["startingLocations"]
+                    const destinationLocations = result["destinationLocations"]
+    
+                    console.log("startingLocations: ", startingLocations);
+                    console.log("destinationLocations: ", destinationLocations);
+
+                    this.setState({
+                        startingLocations: startingLocations,
+                        destinationLocations: destinationLocations
+                    });
+                }
             }).catch((error) => {
                 console.log('[-] Error: ', error);
             });
-
-            if (response["previousInstance"] === true) {
-                // recover the previous instance 
-                const startingLocations = response["startingLocations"]
-                const destinationLocations = response["destinationLocations"]
-            }
         }
     }
 
@@ -145,8 +155,8 @@ class MyGoogleMap extends Component {
                 ...this.state.startingLocations,
                 {
                     address: address,
-                    lat: lat,
-                    lng: lng
+                    latitude: lat,
+                    longitude: lng
                 }
             ] 
         }, this.synchronizeStartingLocationsWithDatabase);
@@ -178,8 +188,8 @@ class MyGoogleMap extends Component {
                 ...this.state.destinationLocations,
                 {
                     address: address,
-                    lat: lat,
-                    lng: lng
+                    latitude: lat,
+                    longitude: lng
                 }
             ] 
         }, this.synchronizeDestinationLocationsWithDatabase);
@@ -205,14 +215,20 @@ class MyGoogleMap extends Component {
         });
     }
 
-    generateShareableLink = () => {
-        const base64 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/";
-        var newLink = "";
-        for (var i = 0; i < 8; i += 1) {
-            newLink += base64[Math.floor(Math.random() * base64.length)]
-        }
+    getShareableLink = () => {
+        if (window.location.pathname === '/' && this.state.link === '') {
+            // generate new shareable instance link
+            const base64 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/";
+            var newLink = "";
+            for (var i = 0; i < 8; i += 1) {
+                newLink += base64[Math.floor(Math.random() * base64.length)]
+            }
 
-        this.setState({ link: newLink });
+            this.setState({ link: newLink });
+        } else {
+            const newLink = window.location.pathname.slice(1);
+            this.setState({ link: newLink});   
+        }
     }
 
     showShareableLink = () => {
@@ -254,15 +270,15 @@ class MyGoogleMap extends Component {
                         return <Marker
                                 key={id}
                                 text={startingLocation.address}
-                                lat={startingLocation.lat}
-                                lng={startingLocation.lng}/>
+                                lat={startingLocation.latitude}
+                                lng={startingLocation.longitude}/>
                     })}
                     {this.state.destinationLocations.map((destinationLocation, id) => {
                         return <Marker
                                 key={id}
                                 text={destinationLocation.address}
-                                lat={destinationLocation.lat}
-                                lng={destinationLocation.lng}/>
+                                lat={destinationLocation.latitude}
+                                lng={destinationLocation.longitude}/>
                     })}
                     <Marker
                      text={this.state.address}

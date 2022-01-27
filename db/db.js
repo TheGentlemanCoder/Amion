@@ -18,8 +18,9 @@ async function fetchStartingLocations(link) {
         .then(async (conn) => {
             const response = await conn.query(parameterized_query, [link_id]);
             await conn.commit();
+            conn.end();
 
-            const startingLocations = response.slice(-1);
+            const startingLocations = response.slice(0, response.length - 1);
             return startingLocations;
         }).catch((error) => {
             console.log("[-] MariaDB Error: ", error);
@@ -30,15 +31,16 @@ async function fetchStartingLocations(link) {
 async function fetchDestinationLocations(link) {
     const link_id = await getLinkID(link);
     const parameterized_query = "SELECT a.address, a.latitude, a.longitude \
-                                 FROM DestinationLocation sl JOIN Address a ON (sl.destinationAddress = a.address) \
-                                 WHERE sl.link_id = (?)";
+                                 FROM DestinationLocation dl JOIN Address a ON (dl.destinationAddress = a.address) \
+                                 WHERE dl.link_id = (?)";
 
     return await pool.getConnection()
         .then(async (conn) => {
             const response = await conn.query(parameterized_query, [link_id]);
             await conn.commit();
+            conn.end();
 
-            const destinationLocations = response.slice(-1);
+            const destinationLocations = response.slice(0, response.length -1);
             return destinationLocations;
         }).catch((error) => {
             console.log("[-] MariaDB Error: ", error);
@@ -53,6 +55,7 @@ async function linkExists(link) {
         .then(async (conn) => {
             const response = await conn.query(parameterized_query, [link]);
             await conn.commit();
+            conn.end();
 
             const count = response[0]['COUNT(*)']
             console.log("Count: ", count);
@@ -79,6 +82,7 @@ async function insertStartingLocation(link, address, latitude, longitude) {
         .then(async (conn) => {
             await conn.query(parameterized_query, [link_id, address]);
             await conn.commit();
+            conn.end();
         }).catch((error) => {
             console.log("[-] MariaDB Error: ", error);
         });
@@ -88,7 +92,9 @@ async function insertDestinationLocation(link, address, latitude, longitude) {
     // insert address so foreign key constraint is satisfied
     await insertAddress(address, latitude, longitude);
     await insertLink(link);
+    console.log("Getting link ID...");
     const link_id = await getLinkID(link);
+    console.log("Link ID: ", link_id);
 
     const parameterized_query = "INSERT INTO DestinationLocation VALUES (?, ?)";
 
@@ -96,6 +102,7 @@ async function insertDestinationLocation(link, address, latitude, longitude) {
         .then(async (conn) => {
             await conn.query(parameterized_query, [link_id, address]);
             await conn.commit();
+            conn.end();
         }).catch((error) => {
             console.log("[-] MariaDB Error: ", error);
         });
@@ -108,6 +115,7 @@ async function insertAddress(address, latitude, longitude) {
         .then(async (conn) => {
             await conn.query(parameterized_query, [address, latitude, longitude]);
             await conn.commit();
+            conn.end();
         }).catch((error) => {
             if (error.toString().includes("Duplicate entry")) {
                 console.log("[*] Duplicate entry");
@@ -132,6 +140,7 @@ async function insertLink(link) {
         .then(async (conn) => {
             await conn.query(parameterized_query, [link]);
             await conn.commit();
+            conn.end();
         }).catch((error) => {
             console.log("[-] MariaDB Error: ", error);
         });
@@ -143,7 +152,8 @@ async function getLinkID(link) {
     return await pool.getConnection()
         .then(async (conn) => {
             const response = await conn.query(parameterized_query, [link]);
-            conn.commit();
+            await conn.commit();
+            conn.end();
             return response[0]["link_id"];
         }).catch((error) => {
             console.log("[-] MariaDB Error: ", error);
